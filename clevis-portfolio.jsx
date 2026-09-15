@@ -38,6 +38,7 @@ function GlobalStyles() {
       .clevis-root{ min-height: 100dvh; font-family: var(--font-sans); }
       .hero-image-wrap{
         height: min(78%, 78dvh);
+        width: min(52vw, 640px);
         max-width: 100%;
       }
       .hero-image-wrap img{
@@ -51,6 +52,12 @@ function GlobalStyles() {
         .hero-image-wrap{
           width: min(88vw, 420px);
           height: min(58dvh, 140vw);
+        }
+      }
+      @media (min-width: 768px) and (max-width: 1100px){
+        .hero-image-wrap{
+          width: min(68vw, 560px);
+          height: min(72dvh, 78%);
         }
       }
 
@@ -310,9 +317,7 @@ function ParticleBackground() {
 /* ---------------------------------------------------------------- */
 function Header({ onOpenDrawer, onOpenView }) {
   const links = [
-    { label: "ARCHIVE", view: "archive" },
     { label: "PROCESS", view: "process" },
-    { label: "LABS", view: "labs" },
   ];
   return (
     <header className="relative z-30 flex items-center justify-between px-6 md:px-10 py-5">
@@ -361,7 +366,7 @@ function Header({ onOpenDrawer, onOpenView }) {
           (e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)")
         }
       >
-        COMMISSION
+          EXPLORE
       </button>
     </header>
   );
@@ -523,7 +528,12 @@ function FooterMarquee() {
 /* ---------------------------------------------------------------- */
 /* Info drawer                                                       */
 /* ---------------------------------------------------------------- */
-const MENU_ITEMS = ["PROJECTS", "BLOG", "ABOUT", "ARCHIVE", "PROCESS", "LABS", "LET'S WORK"];
+const MENU_ITEMS = [
+  { label: "PROJECTS", view: "projects" },
+  { label: "ABOUT ME", view: "about" },
+  { label: "PROCESS", view: "process" },
+  { label: "LET'S WORK", view: "contact" },
+];
 
 const PROJECTS = [
   {
@@ -548,20 +558,21 @@ const PROJECTS = [
     url: "",
   },
 ];
+const PROJECTS_STORAGE_KEY = "clevis-portfolio-projects";
 
 function MenuList({ onSelect }) {
   return (
     <ul className="flex flex-col">
       {MENU_ITEMS.map((item) => (
-        <li key={item} style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+        <li key={item.view} style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
           <button
-            onClick={() => onSelect(item)}
+            onClick={() => onSelect(item.view)}
             className="w-full text-left py-5 uppercase tracking-wide transition-colors"
             style={{ fontFamily: "var(--font-display)", fontSize: "clamp(24px,5vw,40px)" }}
             onMouseEnter={(e) => (e.currentTarget.style.color = COLORS.lime)}
             onMouseLeave={(e) => (e.currentTarget.style.color = COLORS.white)}
           >
-            {item}
+            {item.label}
           </button>
         </li>
       ))}
@@ -590,12 +601,18 @@ function ContactForm() {
           GET IN TOUCH
         </p>
         <div className="flex flex-col gap-2">
+          <p className="text-xs tracking-widest opacity-50" style={{ fontFamily: "var(--font-mono)" }}>
+            CONTACT
+          </p>
           <a
             href="tel:+254743483176"
             className="text-lg transition-colors hover:text-lime-400"
           >
             0743483176
           </a>
+          <p className="mt-3 text-xs tracking-widest opacity-50" style={{ fontFamily: "var(--font-mono)" }}>
+            EMAIL
+          </p>
           <a
             href="mailto:Nyongesaclevis76@gmail.com"
             className="text-lg transition-colors hover:text-lime-400"
@@ -725,6 +742,41 @@ function AboutView() {
 }
 
 function ProjectsView() {
+  const [projects, setProjects] = useState(() => {
+    try {
+      const savedProjects = window.localStorage.getItem(PROJECTS_STORAGE_KEY);
+      return savedProjects ? JSON.parse(savedProjects) : PROJECTS;
+    } catch {
+      return PROJECTS;
+    }
+  });
+  const [adminMode] = useState(() => new URLSearchParams(window.location.search).get("admin") === "1");
+
+  const updateProject = (index, field, value) => {
+    setProjects((currentProjects) =>
+      currentProjects.map((project, projectIndex) =>
+        projectIndex === index ? { ...project, [field]: value } : project
+      )
+    );
+  };
+
+  const addProject = () => {
+    setProjects((currentProjects) => [
+      ...currentProjects,
+      {
+        number: String(currentProjects.length + 1).padStart(2, "0"),
+        title: "New Project",
+        category: "WEBSITE",
+        description: "Describe this project for potential clients.",
+        url: "",
+      },
+    ]);
+  };
+
+  const saveProjects = () => {
+    window.localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects));
+  };
+
   return (
     <article className="flex flex-col gap-8">
       <div>
@@ -747,8 +799,78 @@ function ProjectsView() {
         </p>
       </div>
 
+      {adminMode && (
+        <section className="border-y py-6" style={{ borderColor: COLORS.lime }}>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs tracking-widest" style={{ color: COLORS.lime, fontFamily: "var(--font-mono)" }}>
+                ADMIN PROJECT MANAGER
+              </p>
+              <p className="mt-2 text-sm opacity-70">Add your project link, then save your changes.</p>
+            </div>
+            <button
+              type="button"
+              onClick={addProject}
+              className="shrink-0 rounded-full border px-3 py-2 text-xs tracking-widest"
+              style={{ borderColor: COLORS.lime, color: COLORS.lime, fontFamily: "var(--font-mono)" }}
+            >
+              ADD PROJECT
+            </button>
+          </div>
+          <div className="mt-6 flex flex-col gap-6">
+            {projects.map((project, index) => (
+              <div key={`admin-${project.number}-${index}`} className="flex flex-col gap-3">
+                <input
+                  className="clevis-input"
+                  value={project.title}
+                  onChange={(event) => updateProject(index, "title", event.target.value)}
+                  placeholder="Project name"
+                  aria-label="Project name"
+                />
+                <select
+                  className="clevis-input"
+                  value={project.category}
+                  onChange={(event) => updateProject(index, "category", event.target.value)}
+                  aria-label="Project type"
+                >
+                  {["WEBSITE", "APP DESIGN", "POSTER DESIGN", "OTHER"].map((category) => (
+                    <option key={category} value={category} style={{ background: COLORS.drawer }}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+                <textarea
+                  className="clevis-input"
+                  value={project.description}
+                  onChange={(event) => updateProject(index, "description", event.target.value)}
+                  placeholder="Project description"
+                  rows={2}
+                  aria-label="Project description"
+                />
+                <input
+                  className="clevis-input"
+                  value={project.url}
+                  onChange={(event) => updateProject(index, "url", event.target.value)}
+                  placeholder="https://your-project-link.com"
+                  type="url"
+                  aria-label="Project link"
+                />
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={saveProjects}
+            className="mt-6 w-full rounded-full py-3 text-xs tracking-widest"
+            style={{ background: COLORS.lime, color: "#000", fontFamily: "var(--font-mono)" }}
+          >
+            SAVE PROJECTS
+          </button>
+        </section>
+      )}
+
       <div className="flex flex-col">
-        {PROJECTS.map((project) => (
+        {projects.map((project) => (
           <article
             key={project.number}
             className="border-t py-6"
@@ -1013,15 +1135,7 @@ function InfoDrawer({ open, view, setView, onClose }) {
             <div className="flex-1 overflow-y-auto px-6 py-8">
               {view === "menu" ? (
                 <MenuList
-                  onSelect={(item) => {
-                    if (item === "LET'S WORK") setView("contact");
-                    if (item === "ABOUT") setView("about");
-                    if (item === "BLOG") setView("blog");
-                    if (item === "PROJECTS") setView("projects");
-                    if (item === "ARCHIVE") setView("archive");
-                    if (item === "PROCESS") setView("process");
-                    if (item === "LABS") setView("labs");
-                  }}
+                  onSelect={setView}
                 />
               ) : view === "projects" ? (
                 <ProjectsView />
