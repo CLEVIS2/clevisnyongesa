@@ -40,6 +40,8 @@ function GlobalStyles() {
         height: min(78%, 78dvh);
         width: min(52vw, 640px);
         max-width: 100%;
+        display: flex;
+        justify-content: center;
       }
       .hero-image-wrap img{
         display: block;
