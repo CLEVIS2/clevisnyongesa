@@ -44,9 +44,14 @@ function GlobalStyles() {
         display: block;
         max-width: 100%;
         max-height: 100%;
+        object-fit: contain;
+        object-position: bottom center;
       }
       @media (max-width: 767px){
-        .hero-image-wrap{ height: min(70%, 64dvh); }
+        .hero-image-wrap{
+          width: min(88vw, 420px);
+          height: min(58dvh, 140vw);
+        }
       }
 
       .stroke-text{
