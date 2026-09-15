@@ -528,23 +528,23 @@ const MENU_ITEMS = ["PROJECTS", "BLOG", "ABOUT", "ARCHIVE", "PROCESS", "LABS", "
 const PROJECTS = [
   {
     number: "01",
-    title: "Interface Systems",
-    category: "UI/UX DESIGN",
-    description: "A focused interface concept built around clear hierarchy and effortless navigation.",
+    title: "Your Website Project",
+    category: "WEBSITE",
+    description: "Add your website project here so clients can explore the live experience.",
     url: "",
   },
   {
     number: "02",
-    title: "Mobile Companion",
-    category: "ANDROID DEVELOPMENT",
-    description: "A practical mobile experience connecting thoughtful interaction design with useful technology.",
+    title: "Your App Project",
+    category: "APP DESIGN",
+    description: "Add your app prototype, case study, or app store link here.",
     url: "",
   },
   {
     number: "03",
-    title: "Visual Direction",
-    category: "GRAPHIC DESIGN",
-    description: "A bold visual identity exploring how type, color, and composition create a memorable presence.",
+    title: "Your Poster Project",
+    category: "POSTER DESIGN",
+    description: "Add a hosted poster image or project page here for clients to view.",
     url: "",
   },
 ];
@@ -742,8 +742,8 @@ function ProjectsView() {
           connect.
         </h2>
         <p className="mt-5 leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>
-          Explore selected work across product design, visual design, and Android
-          development. Live project links open in a new tab.
+          Explore selected websites, apps, and posters. Each project opens in a new
+          tab so clients can view your work without losing their place here.
         </p>
       </div>
 
@@ -764,7 +764,7 @@ function ProjectsView() {
                   target="_blank"
                   rel="noreferrer"
                   aria-label={`View ${project.title}`}
-                  className="flex items-center gap-1 text-xs tracking-widest transition-opacity hover:opacity-70"
+                  className="flex shrink-0 items-center gap-1 text-xs tracking-widest transition-opacity hover:opacity-70"
                   style={{ color: COLORS.lime, fontFamily: "var(--font-mono)" }}
                 >
                   VIEW LIVE <ArrowUpRight size={14} />
@@ -781,6 +781,17 @@ function ProjectsView() {
             <p className="mt-3 leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>
               {project.description}
             </p>
+            {project.url && (
+              <a
+                href={project.url}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-5 inline-flex w-fit items-center gap-2 rounded-full px-4 py-2 text-xs tracking-widest transition-opacity hover:opacity-80"
+                style={{ background: COLORS.lime, color: "#000", fontFamily: "var(--font-mono)" }}
+              >
+                OPEN PROJECT <ArrowUpRight size={14} />
+              </a>
+            )}
           </article>
         ))}
       </div>
